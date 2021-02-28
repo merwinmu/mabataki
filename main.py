@@ -10,6 +10,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pandas_datareader import data, wb
 from Plotter import getValue
+from Plotter import getClose
+from Plotter import getSenkouA
+from Plotter import getSenkouB
+
 import schedule
 import time
 import datetime as dt
@@ -96,10 +100,12 @@ def send_mail(text):
     receiver_email = "merwingeee@gmail.com"
     password = "ichimoku123"
     message = """\
-    Subject: Ichimoku senpai
+    Subject: Ichimoku Sensei
 
-    This message is sent from Python """ + text
+    This message is sent from Python 
+    
 
+    """ + text  + " Signal"
 
 
     context = ssl.create_default_context()
@@ -130,7 +136,7 @@ def job_function():
         })
         interval = 1
         values = []
-        while( 16 >= interval):                    
+        while( 1 >= interval):                    
             val = interval * 15
 
             print("Value at " + str(val))
@@ -191,7 +197,10 @@ def job_function():
 
         check = all(x==values[0] for x in values)
 
-        if(check):
+        check_false = True
+
+        if check:
+            check_false = True
             if values[0] == 1:
                 send_mail("BUY NOW")
             else:
