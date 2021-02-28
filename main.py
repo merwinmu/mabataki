@@ -84,7 +84,7 @@ def generate_csv(a):
 def schedule_actions():
 
   # Every Monday task() is called at 20:
-  schedule.every(1).minutes.do(job_function)
+  schedule.every(9).minutes.do(job_function)
 
 
   # Checks whether a scheduled task is pending to run or no
@@ -136,7 +136,7 @@ def job_function():
         })
         interval = 1
         values = []
-        while( 1 >= interval):                    
+        while( 16 >= interval):                    
             val = interval * 15
 
             print("Value at " + str(val))
