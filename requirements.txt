@@ -1,10 +1,7 @@
 APScheduler==3.7.0
-
-
-conda==4.8.3
+conda==4.3.16
 conda-package-handling==1.7.0+0.g7c4a471.dirty
 crontab==0.22.9
-
 dateparser==1.0.0
 DateTime==4.3
 docopt==0.6.2
