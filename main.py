@@ -83,7 +83,7 @@ def schedule_actions():
   schedule.every(1).minutes.do(job_function)
 
 
-  # Checks whether a scheduled task is pending to run or not
+  # Checks whether a scheduled task is pending to run or no
   while True:
     schedule.run_pending()
     time.sleep(1)            
