@@ -97,7 +97,7 @@ def send_mail(text):
     port = 587  # For starttls
     smtp_server = "smtp.gmail.com"
     sender_email = "ichimokupython@gmail.com"
-    receiver_email = "merwingeee@gmail.com,merwin7@yahoo.com"
+    receiver_email = "p.panthalattiyil@gmail.com"
     password = "ichimoku123"
     message = """\
     Subject: Ichimoku Sensei
