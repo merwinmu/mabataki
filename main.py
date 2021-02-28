@@ -79,7 +79,7 @@ def generate_csv(a):
 
 def schedule_actions():
 
-  # Every Monday task() is called at 20:00
+  # Every Monday task() is called at 20:
   schedule.every(1).minutes.do(job_function)
 
 
