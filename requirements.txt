@@ -1,0 +1,17 @@
+pandas
+websocket-client
+websocket
+json
+random
+string
+re
+csv
+numpy
+datetime
+matplotlib
+pandas_datareader
+Plotter
+schedule
+time
+smtplib
+ssl
