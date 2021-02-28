@@ -80,7 +80,7 @@ def generate_csv(a):
 def schedule_actions():
 
   # Every Monday task() is called at 20:00
-  schedule.every(9).minutes.do(job_function)
+  schedule.every(1).minutes.do(job_function)
 
 
   # Checks whether a scheduled task is pending to run or not
