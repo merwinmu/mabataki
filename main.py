@@ -93,7 +93,7 @@ def schedule_actions():
   # Every Monday task() is called at 20:
   # TODO CHANGE TO 9
 
-  schedule.every(1).minutes.do(start_thread)
+  schedule.every(9).minutes.do(start_thread)
   signal_list = start_thread()
   # Checks whether a scheduled task is pending to run or no
   while True:
@@ -150,7 +150,7 @@ def job_function(id):
 
         # TODO CHANGE TO 16
 
-        while( 2 >= interval):                    
+        while( 16 >= interval):                    
             val = interval * 15
 
             print("Value at " + str(val))
