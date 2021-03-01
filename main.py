@@ -14,14 +14,21 @@ from Plotter import getClose
 from Plotter import getSenkouA
 from Plotter import getSenkouB
 
+import threading
 import schedule
 import time
 import datetime as dt
 import smtplib, ssl
 
-
+class ThreadWithResult(threading.Thread):
+    def __init__(self, group=None, target=None, name=None, args=(), kwargs={}, *, daemon=None):
+        def function():
+            self.result = target(*args, **kwargs)
+        super().__init__(group=group, target=function, name=name, daemon=daemon)
 
 values = []
+threads = []
+
 
 def filter_raw_message(text):
     try:
@@ -65,11 +72,11 @@ def sendRawMessage(ws, message):
 def sendMessage(ws, func, args):
     ws.send(createMessage(func, args))
 
-def generate_csv(a):
+def generate_csv(a,id):
     out= re.search('"s":\[(.+?)\}\]', a).group(1)
     x=out.split(',{\"')
     
-    with open('data_file.csv', mode='w', newline='') as data_file:
+    with open(id+'.csv', mode='w', newline='') as data_file:
         employee_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     
         employee_writer.writerow(['index', 'date', 'open', 'high', 'low', 'close', 'volume'])
@@ -82,11 +89,12 @@ def generate_csv(a):
             employee_writer.writerow([ind, ts, float(xi[5]), float(xi[6]), float(xi[7]), float(xi[8]), float(xi[9])])
 
 def schedule_actions():
-
+    
   # Every Monday task() is called at 20:
-  schedule.every(9).minutes.do(job_function)
+  # TODO CHANGE TO 9
 
-
+  schedule.every(1).minutes.do(start_thread)
+  signal_list = start_thread()
   # Checks whether a scheduled task is pending to run or no
   while True:
     schedule.run_pending()
@@ -105,7 +113,7 @@ def send_mail(text):
     This message is sent from Python 
     
 
-    """ + text  + " Signal"
+    """ + text 
 
 
     context = ssl.create_default_context()
@@ -117,9 +125,9 @@ def send_mail(text):
         server.sendmail(sender_email, receiver_email, message)
 
 
-def job_function():
+def job_function(id):
 
-    if dt.datetime.today().weekday() == 6:
+    if dt.datetime.today().weekday() != 6:
         # Initialize the headers needed for the websocket connection
         headers = json.dumps({
             # 'Connection': 'upgrade',
@@ -134,9 +142,15 @@ def job_function():
             # 'Pragma': 'no-cache',
             # 'Upgrade': 'websocket'
         })
+
+        print("schedule job started")
+
         interval = 1
         values = []
-        while( 16 >= interval):                    
+
+        # TODO CHANGE TO 16
+
+        while( 2 >= interval):                    
             val = interval * 15
 
             print("Value at " + str(val))
@@ -156,12 +170,12 @@ def job_function():
             sendMessage(ws, "chart_create_session", [chart_session, ""])
             sendMessage(ws, "quote_create_session", [session])
             sendMessage(ws,"quote_set_fields", [session,"ch","chp","current_session","description","local_description","language","exchange","fractional","is_tradable","lp","lp_time","minmov","minmove2","original_name","pricescale","pro_name","short_name","type","update_mode","volume","currency_code","rchp","rtc"])
-            sendMessage(ws, "quote_add_symbols",[session, "FOREXCOM:USDCHF", {"flags":['force_permission']}])
-            sendMessage(ws, "quote_fast_symbols", [session,"FOREXCOM:USDCHF"])
+            sendMessage(ws, "quote_add_symbols",[session, id, {"flags":['force_permission']}])
+            sendMessage(ws, "quote_fast_symbols", [session,id])
 
             #st='~m~140~m~{"m":"resolve_symbol","p":}'
             #p1, p2 = filter_raw_message(st)
-            sendMessage(ws, "resolve_symbol", [chart_session,"symbol_1","={\"symbol\":\"FOREXCOM:USDCHF\",\"adjustment\":\"splits\",\"session\":\"extended\"}"])
+            sendMessage(ws, "resolve_symbol", [chart_session,"symbol_1","={\"symbol\":\""+id+"\",\"adjustment\":\"splits\",\"session\":\"extended\"}"])
             sendMessage(ws, "create_series", [chart_session, "s1", "s1", "symbol_1", str(val), 2000])
             #sendMessage(ws, "create_study", [chart_session,"st4","st1","s1","ESD@tv-scripting-101!",{"text":"BNEhyMp2zcJFvntl+CdKjA==_DkJH8pNTUOoUT2BnMT6NHSuLIuKni9D9SDMm1UOm/vLtzAhPVypsvWlzDDenSfeyoFHLhX7G61HDlNHwqt/czTEwncKBDNi1b3fj26V54CkMKtrI21tXW7OQD/OSYxxd6SzPtFwiCVAoPbF2Y1lBIg/YE9nGDkr6jeDdPwF0d2bC+yN8lhBm03WYMOyrr6wFST+P/38BoSeZvMXI1Xfw84rnntV9+MDVxV8L19OE/0K/NBRvYpxgWMGCqH79/sHMrCsF6uOpIIgF8bEVQFGBKDSxbNa0nc+npqK5vPdHwvQuy5XuMnGIqsjR4sIMml2lJGi/XqzfU/L9Wj9xfuNNB2ty5PhxgzWiJU1Z1JTzsDsth2PyP29q8a91MQrmpZ9GwHnJdLjbzUv3vbOm9R4/u9K2lwhcBrqrLsj/VfVWMSBP","pineId":"TV_SPLITS","pineVersion":"8.0"}])
 
@@ -179,11 +193,9 @@ def job_function():
                     print(e)
                     break
                 
-            generate_csv(a)
-            temp_result = getValue()
+            generate_csv(a,id)
 
-            print(getValue())
-            values = np.append(values,getValue())
+            values = np.append(values,getValue(id))
 
             interval = interval + 1
 
@@ -199,14 +211,64 @@ def job_function():
 
         check_false = True
 
+        print("schedule job finished "+id)
+
+
         if check:
             check_false = True
             if values[0] == 1:
-                send_mail("BUY NOW")
+                result_signal = ["Buy", id, "Close Price: "+ str(getClose()), "Senkou A "+ str(getSenkouA()), "Senkou B "+ str(getSenkouB())]
+                return result_signal
             else:
-                send_mail("SELL NOW")
+                result_signal = ["Sell", id,"Close Price: "+ str(getClose()), "Senkou A "+ str(getSenkouA()), "Senkou B "+ str(getSenkouB())]
+                return result_signal
         else:
             print("Elements are not equal")
+
+currency_list = ["FOREXCOM:EURUSD","FOREXCOM:USDCHF","FOREXCOM:EURCHF","FOREXCOM:CADCHF","FOREXCOM:EURGBP","FOREXCOM:EURCAD"]
+thread_list = []
+def start_thread():
+    print("Thread started")
+
+
+    for x in range (len(currency_list)):
+        thread = ThreadWithResult(target=job_function, args=(currency_list[x],))
+        thread_list.append(thread)
+        thread.start()
+
+    message = ""        
+    for x in range(len(thread_list)):
+        thread_list[x].join()
+
+    for x in range(len(thread_list)):
+        message+=(str(thread_list[x].result) + " \n\n")
+
+#     thread1.start()
+#     thread2.start()
+#     thread3.start()
+#     thread4.start()
+#     thread5.start()
+#    # thread6.start()
+#    # thread7.start()
+#    # thread8.start()
+    
+#     thread1.join()
+#     thread2.join()
+#     thread3.join()
+#     thread4.join()
+#     thread5.join()
+#    # thread6.join()
+#    # thread7.join()
+#    # thread8.join()
+
+#   message = str(thread1.result) + " \n\n" + str(thread2.result) + " \n\n" + str(thread3.result)  + " \n\n" +   str(thread4.result)+ " \n\n" + str(thread5.result) 
+    send_mail(message)
+
+    print(message)
+
+    message = ""
+    thread_list.clear()
+
 
 
 schedule_actions()

@@ -3,12 +3,10 @@ import matplotlib.pyplot as plt
 from pandas_datareader import data, wb
 from datetime import timedelta
 
-global_close_value = 0
-global_senkou_span_a = 0
-global_senkou_span_b = 0
 
-def getValue():
-        df = pd.read_csv('data_file.csv', index_col=0)
+
+def getValue(path):
+        df = pd.read_csv(path+".csv", index_col=0)
         high_9 = df['high'].rolling(window= 9).max()
         low_9 = df['low'].rolling(window= 9).min()
         df['tenkan_sen'] = (high_9 + low_9) /2
@@ -41,13 +39,14 @@ def getValue():
 
         current = df.tail(1)
 
+        global close_value
+        global senkou_span_a
+        global senkou_span_b
+
         close_value = current['close'].values[0]
         senkou_span_a = current['senkou_span_a'].values[0]
         senkou_span_b = current['senkou_span_b'].values[0]
 
-        global_close_value = close_value
-        global_senkou_span_a = senkou_span_a
-        global_senkou_span_b = senkou_span_b
 
         print(close_value)
         print(senkou_span_a)
@@ -61,14 +60,17 @@ def getValue():
             return int(-1)
         if senkou_span_a > close_value and close_value > senkou_span_b:
             return int(0)
+        
+        if senkou_span_b > close_value and close_value > senkou_span_a:
+            return int(2)
 
 def getClose():
     return close_value
 
 def getSenkouA():
-    return senkou_span_a
+    return float(senkou_span_a)
 
 def getSenkouB():
-    return senkou_span_b
+    return float(senkou_span_b)
 
 
