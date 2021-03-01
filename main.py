@@ -127,7 +127,7 @@ def send_mail(text):
 
 def job_function(id):
 
-    if dt.datetime.today().weekday() != 6:
+    if dt.datetime.today().weekday() != 5 or dt.datetime.today().weekday() != 5:
         # Initialize the headers needed for the websocket connection
         headers = json.dumps({
             # 'Connection': 'upgrade',
@@ -224,6 +224,10 @@ def job_function(id):
                 return result_signal
         else:
             print("Elements are not equal")
+    
+    else:
+        time.sleep(172800)
+
 
 currency_list = ["FOREXCOM:EURUSD","FOREXCOM:USDCHF","FOREXCOM:EURCHF","FOREXCOM:CADCHF","FOREXCOM:EURGBP","FOREXCOM:EURCAD"]
 thread_list = []
