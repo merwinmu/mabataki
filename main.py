@@ -324,7 +324,7 @@ def start_thread():
 
 
 #   message = str(thread1.result) + " \n\n" + str(thread2.result) + " \n\n" + str(thread3.result)  + " \n\n" +   str(thread4.result)+ " \n\n" + str(thread5.result) 
-    if isNowInTimePeriod(dt.time(7,00), dt.time(22,00), dt.datetime.now().time()) and not checkSame(previousThreadListResult, currentThreadListResult):
+    if isNowInTimePeriod(dt.time(7,00), dt.time(18,00), dt.datetime.now().time()) and not checkSame(previousThreadListResult, currentThreadListResult):
         
         print("Different Signal than previous")
         send_mail(message)
