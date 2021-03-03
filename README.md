@@ -1,8 +1,5 @@
-# Template for hosting python scripts and applications on Heroku
+# Tradingview Bot with Ichimoku cloud calculation for FOREX Currencies
 
-This is a small example of running your script with
-[Heroku](https://www.heroku.com/). You can run almost any python application
-with any dependencies.
 
 ## Getting Started
 
@@ -87,6 +84,7 @@ with any dependencies.
 
 ## Authors
 
+* merwinmu
 * @michaelkrukov - https://michaelkrukov.ru/
 
 ## Acknowledgments
