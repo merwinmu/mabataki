@@ -103,7 +103,7 @@ def schedule_actions():
   # Every Monday task() is called at 20:
   # TODO CHANGE TO 9
   global bool_flag
-  schedule.every(8).minutes.do(start_thread)
+  schedule.every(60).minutes.do(start_thread)
   signal_list = start_thread()
   # Checks whether a scheduled task is pending to run or no p.panthalattiyil@gmail.com
   while True:
