@@ -114,9 +114,9 @@ def schedule_actions():
 def send_mail(text):
     port = 587  # For starttls
     smtp_server = "smtp.gmail.com"
-    sender_email = "ichimokupython@gmail.com"
-    receiver_email = "p.panthalattiyil@gmail.com"
-    password = "ichimoku123"
+    sender_email = " "
+    receiver_email = " "
+    password = " "
     message = """\
     Subject: Ichimoku Sensei
 
